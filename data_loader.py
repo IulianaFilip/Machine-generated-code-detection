@@ -6,7 +6,7 @@ from pathlib import Path
 from transformers import AutoTokenizer
 
 class CodeDataset(torch.utils.data.Dataset):
-    """PyTorch Dataset for loading Python code files and their labels."""
+    """PyTorch Dataset for loading code files (Python, Java, C#) and their labels."""
     
     def __init__(self, csv_path: str, root_dir: str, tokenizer, max_length: int = 512):
         self.root_dir = root_dir
@@ -17,11 +17,16 @@ class CodeDataset(torch.utils.data.Dataset):
         with open(csv_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                self.samples.append({
-                    'file_path': row['file_path'],
-                    'label': int(row['label']),
-                    'source': row['source']
-                })
+                file_path = os.path.join(self.root_dir, row['file_path'])
+                # Only add samples if the file exists
+                if os.path.exists(file_path):
+                    self.samples.append({
+                        'file_path': row['file_path'],
+                        'label': int(row['label']),
+                        'source': row['source']
+                    })
+                else:
+                    print(f"Warning: File not found - {file_path}")
     
     def __len__(self):
         return len(self.samples)
@@ -32,8 +37,13 @@ class CodeDataset(torch.utils.data.Dataset):
         label = sample['label']
         
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                code = f.read()
+            # Try UTF-8 first, fallback to Latin-1 if needed
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    code = f.read()
+            except UnicodeDecodeError:
+                with open(file_path, 'r', encoding='latin-1') as f:
+                    code = f.read()
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
             code = ""
