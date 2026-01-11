@@ -1,19 +1,3 @@
-#
-# This script can be used for any purpose without limitation subject to the
-# conditions at http://www.ccdc.cam.ac.uk/Community/Pages/Licences/v2.aspx
-#
-# This permission notice and the following statement of attribution must be
-# included in all copies or substantial portions of this script.
-#
-# 2020-01-21: created by S.B.Wiggin, the Cambridge Crystallographic Data Centre
-#
-# 2024-09-30: Modified by Olivier Marchand, University of Ottawa, to support CIF structures as input.
-
-"""
-    MOF_Dimensions_CIF.py  - processes CIF structures by performing two expansions of a polymeric 
-    network and produces minimum area bounding boxes. Comparison of the two bounding boxes gives the growth dimensions 
-    of the framework.
-"""
 
 from ccdc.io import EntryReader
 import numpy as np
